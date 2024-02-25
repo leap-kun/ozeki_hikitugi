@@ -19,14 +19,14 @@ ros_openpoeを実装する際には、scrapboxに上がっているメモ書き�
 - Cudmm 8.5
 - Nvidia Driver:535
 
-**ここで注意**
+***ここで注意***
 
 研究室のPCのNvidia Driverのversionを古くして欲しいです。
-恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く*点滅*したり*ノイズが入ること*が多々あります。**
-そのため、研究室のPCを扱う上で、*Nvidia Driverのインストール等*を覚えてもらう為に一度、手を動かして感覚を補いましょう！！
+恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く**点滅**したり**ノイズが入ること**が多々あります。**
+そのため、研究室のPCを扱う上で、**Nvidia Driverのインストール等**を覚えてもらう為に一度、手を動かして感覚を補いましょう！！
 ## Usage
 
-研究室のPCを扱う上で以下のコマンドを入力すれば動く。
+研究室のPCを扱う上で以下のコマンドを入力すれば動きます。
 
 ```
 cd catkin_ws
@@ -51,7 +51,8 @@ ER20027:尾関健太郎
 
 ## Licence
 
-[openpose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
-[ros_openpose](https://github.com/ravijo/ros_openpose)
-[ros_openposeの構築の上で参照になったサイト](https://yoshistl.hatenablog.com/entry/2022/07/31/014254)
-[azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)
+[openpose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)  
+[ros_openpose](https://github.com/ravijo/ros_openpose)  
+[ros_openposeの構築の上で参照になったサイト](https://yoshistl.hatenablog.com/entry/2022/07/31/014254)  
+[azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)  
+[Nvidia_Driverおすすめ構築サイト](https://qiita.com/tf63/items/0c6da72fe749319423b4)
