@@ -1,0 +1,26 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/kajilab/catkin_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/kajilab/catkin_ws/src/Azure_Kinect_ROS_Driver/include/**",
+        "/home/kajilab/catkin_ws/src/meridian_demo/include/**",
+        "/home/kajilab/catkin_ws/src/ros_openpose/include/**",
+        "/home/kajilab/catkin_ws/src/sysmon_ros/include/**",
+        "/opt/ros/noetic/share/tmc_julius/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
