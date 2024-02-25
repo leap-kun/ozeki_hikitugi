@@ -14,15 +14,17 @@ ros_openpoeを実装する際には、scrapboxに上がっているメモ書き�
 
 ## Requirement
 
+**今現段階の環境**
+
 - Ubuntu 20.04
 - CUDA 11.7
 - Cudmm 8.5
 - Nvidia Driver:535
 
-***ここで注意***
+## attention!!
 
-研究室のPCのNvidia Driverのversionを古くして欲しいです。
-恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く**点滅**したり**ノイズが入ること**が多々あります。**
+研究室のPCのNvidia Driverのversionを今のやつより幾つか古くして欲しいです。
+恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く**点滅**したり**ノイズが入ること**が多々あります。
 そのため、研究室のPCを扱う上で、**Nvidia Driverのインストール等**を覚えてもらう為に一度、手を動かして感覚を補いましょう！！
 ## Usage
 
@@ -37,19 +39,18 @@ roslaunch ros_openpose run.launch camera:=azurekinect
 
 ## Features
 
-## Reference
+
 
 ## Author
 
 梶田研究室卒業生
 ER20027:尾関健太郎
 
-## info
+## なんちゃってhelp
 このリポジトリは、2023年度の卒研生:尾関健太郎の引き継ぎです。 分からない事があったら、覚えている範囲&分かる範囲でSlackでお答えします。
 
 
-
-## Licence
+## Reference
 
 [openpose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)  
 [ros_openpose](https://github.com/ravijo/ros_openpose)  
