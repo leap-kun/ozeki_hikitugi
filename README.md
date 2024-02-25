@@ -1,7 +1,9 @@
 # ozeki_hikitugi
 
 
-# name
+# robot_Contorl
+
+実際にうごかすと
 
 image or gif
 
@@ -26,6 +28,8 @@ ros_openpoeを実装する際には、scrapboxに上がっているメモ書き�
 研究室のPCのNvidia Driverのversionを今のやつより幾つか古くして欲しいです。
 恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く**点滅**したり**ノイズが入ること**が多々あります。
 そのため、研究室のPCを扱う上で、**Nvidia Driverのインストール等**を覚えてもらう為に一度、手を動かして感覚を補いましょう！！
+参考**Reference**に参考になるサイトも掲載していますので、がんばりましょう！！
+
 ## Usage
 
 研究室のPCを扱う上で以下のコマンドを入力すれば動きます。
