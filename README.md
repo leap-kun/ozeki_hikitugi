@@ -66,6 +66,9 @@ type = echo_3D_fix_2.py , type = Meridian_OpenPose_console_2D.py
 type = echo_3D.py , type = Meridian_OpenPose_console_3D.py
 ```
 
+２つのプログラムに共通することだが、一度laucnhファイルで実行すると、**角度と座標データをrosbagファイル**で自動的に保存する。
+これらは卒論では話していない。(冗長になるため)
+
 ## Author
 
 梶田研究室卒業生
