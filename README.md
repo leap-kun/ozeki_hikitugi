@@ -1,8 +1,5 @@
 # ozeki_hikitugi
 
-
-# robot_Contorl
-
 実際にうごかすと
 
 image or gif
@@ -40,10 +37,34 @@ source devel/setup.bash
 roslaunch ros_openpose run.launch camera:=azurekinect
 ```
 
+## 手法1と手法2の切り替え
 
-## Features
+launchファイルの中に入っている,core.launchの下記の部分を変更する。
 
+```
+ <!-- print ros message to terminal -->
+  <group if="$(arg print)" >
+  <!-- output: ターミナルに値を表示するか否か, requireded:ノードが必須かどうか , type:実行するプログラム-->
+    <node name="echo" pkg="ros_openpose" type="echo_3D.py" output = "screen" required="true" >
+      <param name="pub_topic" value="$(arg pub_topic)" />
+    </node>
+       <!--Meridian consoleを起動するための部分 -->
 
+    <node name = "Subscribe_Console" pkg="ros_openpose" type="Meridian_OpenPose_console_3D.py" output = "screen"/>
+    
+  </group>
+</launch>
+```
+
+手法1の場合
+
+```
+type = echo_3D_fix_2.py , type = Meridian_OpenPose_console_2D.py
+```
+手法2の場合
+```
+type = echo_3D.py , type = Meridian_OpenPose_console_3D.py
+```
 
 ## Author
 
@@ -51,6 +72,7 @@ roslaunch ros_openpose run.launch camera:=azurekinect
 ER20027:尾関健太郎
 
 ## なんちゃってhelp
+
 このリポジトリは、2023年度の卒研生:尾関健太郎の引き継ぎです。 分からない事があったら、覚えている範囲&分かる範囲でSlackでお答えします。
 
 
@@ -60,4 +82,6 @@ ER20027:尾関健太郎
 [ros_openpose](https://github.com/ravijo/ros_openpose)  
 [ros_openposeの構築の上で参照になったサイト](https://yoshistl.hatenablog.com/entry/2022/07/31/014254)  
 [azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)  
-[Nvidia_Driverおすすめ構築サイト](https://qiita.com/tf63/items/0c6da72fe749319423b4)
+[Nvidia_Driverおすすめ構築サイト](https://qiita.com/tf63/items/0c6da72fe749319423b4)  
+[Meridian_Twin](https://github.com/Ninagawa123/Meridian_TWIN%EF%BF%BC)  
+[Meridian_LITE](https://github.com/Ninagawa123/Meridian_LITE)
