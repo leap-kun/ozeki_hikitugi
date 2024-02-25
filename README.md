@@ -72,7 +72,7 @@ type = echo_3D.py , type = Meridian_OpenPose_console_3D.py
 
 ## Author
 
-梶田研究室卒業生
+梶田研究室卒業生  
 ER20027:尾関健太郎
 
 ## なんちゃってhelp
