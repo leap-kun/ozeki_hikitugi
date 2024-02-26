@@ -10,7 +10,7 @@
 
 ros_openpoeを実装する際には、scrapboxに上がっているメモ書きを参照してください。 基本的には、home/catkin_ws/src/ros_openpose/の直下にある.CmakeListsやpackage.xmlを参照にすれば大丈夫かと思います。
 
-このリポジトリは、他の研究生が自前のPCを使い為に一応残しておくためのものです。
+このリポジトリは、他の研究生が自前のPCを使う為に一応残しておくためのものです。
 かなり粗があるかと思いますがご容赦くださいm(_ _)m
 
 ## Requirement
@@ -28,6 +28,13 @@ ros_openpoeを実装する際には、scrapboxに上がっているメモ書き�
 恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く**点滅**したり**ノイズが入ること**が多々あります。
 そのため、研究室のPCを扱う上で、**Nvidia Driverのインストール等**を覚えてもらう為に一度、手を動かして感覚を補いましょう！！
 参考**Reference**に参考になるサイトも掲載していますので、がんばりましょう！！
+
+
+## Nvidia Driverインストールの注意点
+
+**recomended**って書いてあるやつは基本入れない。
+基本的に,non-free等の何も書いてないやつをインストールする。
+
 
 ## Usage
 
@@ -62,20 +69,22 @@ launchファイルの中に入っている,core.launchの下記の部分を変�
 手法1の場合
 
 ```
-type = echo_3D_NoIK.py , type = Meridian_OpenPose_console_3D_NoIK.py
+type = "echo_3D_NoIK.py" , type = "Meridian_OpenPose_console_3D_NoIK.py"
 ```
 手法2の場合
 ```
-type = echo_3D.py , type = Meridian_OpenPose_console_3D.py
+type = "echo_3D.py" , type = "Meridian_OpenPose_console_3D.py"
 ```
 
 手法1と手法2の２つのプログラムに共通することだが、一度launchファイルで実行すると、**角度と座標データをrosbagファイル**で自動的に保存する。
 これらは卒論では話していない。(冗長になるため)
 
+
 ## Author
 
 梶田研究室卒業生  
 ER20027:尾関健太郎
+
 
 ## なんちゃってhelp
 
