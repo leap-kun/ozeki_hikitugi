@@ -4,6 +4,8 @@
 
 ![gif](https://github.com/leap-kun/ozeki_hikitugi/blob/main/image/OpenPose_KHR_test.gif)
 
+本研究はravi Joshi氏が作成した、ros_openposeとMeridian計画をかけ合わせたものである。
+
 ## Overview
 
 ros_openpoeを実装する際には、scrapboxに上がっているメモ書きを参照してください。 基本的には、home/catkin_ws/src/ros_openpose/の直下にある.CmakeListsやpackage.xmlを参照にすれば大丈夫かと思います。
