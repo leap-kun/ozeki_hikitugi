@@ -2,7 +2,7 @@
 
 実際にうごかすとこんな感じになります。
 
-![gif](https://github.com/leap-kun/ozeki_hikitugi/tree/main/image/OpenPose_KHR_test.gif)
+![gif](https://github.com/leap-kun/ozeki_hikitugi/blob/main/image/OpenPose_KHR_test.gif)
 
 ## Overview
 
