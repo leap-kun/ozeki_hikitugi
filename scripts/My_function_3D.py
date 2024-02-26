@@ -109,17 +109,17 @@ def atan2_deg(y0, y1, y2, z0, z1, z2):
 
 
 #余弦定理
-def cosine_xyz(x2, x1, x3, y2, y1, y3, z2, z1, z3, rot):
+def cosine_xyz(point_Sho,point_Elb,point_Whi):
     # ベクトル化して計算
-    A = np.array([x2 - x1, y2 - y1, z2 - z1])
-    B = np.array([x3 - x2, y3 - y2, z3 - z2])
+    A = np.array([point_Elb[0], - point_Sho[0], point_Elb[1] - point_Sho[1], point_Elb[2] - point_Sho[2]])
+    B = np.array([point_Whi[0] - point_Elb[0], point_Whi[1] - point_Elb[1], point_Whi[2] - point_Elb[2]])
     
     # 三平方の定理を使用
     A_squared = np.sum(A**2)
     B_squared = np.sum(B**2)
     
     # 始点と終点の長さ
-    C_squared = np.sum((np.array([x3 - x1, y3 - y1, z3 - z1]))**2)
+    C_squared = np.sum((np.array([point_Whi[0] - point_Sho[0], point_Whi[1] - point_Sho[1], point_Whi[2] - point_Sho[2]]))**2)
     
     # 余弦定理を用いて角度を計算
     cos = (C_squared - A_squared - B_squared) / (2.0 * np.sqrt(A_squared * B_squared))
@@ -127,10 +127,9 @@ def cosine_xyz(x2, x1, x3, y2, y1, y3, z2, z1, z3, rot):
     # 角度を計算
     theta = np.arccos(np.clip(cos, -1.0, 1.0))
     
-    deg = rot * theta * 180 / np.pi
+    deg = theta * 180 / np.pi
 
     return deg
-
 
 #角度の制限
 def limit_deg(input_deg,max_deg,min_deg):
@@ -286,14 +285,51 @@ def shoulder_ik_np(ez):
     return theta1,theta2
 
 
-def shoulder_ik(ez):
+def shoulder_ik_R(ez):
     tsize = ez.shape[1]
     
     qe = np.array([0.0, 0.0])
     
-    # qeの最小値,最大値
-    qe[0] = np.clip(qe[0], -np.pi, np.pi/2)
-    qe[1] = np.clip(qe[1], -np.pi, 0)
+    qe_m = np.zeros((2, tsize))
+    
+    Rz = R.from_euler('XYZ', [0, 0, np.pi]).as_dcm()
+    
+    for n in range(tsize):
+        qe_m[:, n] = qe
+        
+        if np.abs(ez[2, n]) > np.finfo(float).eps:
+            for k in range(5):
+                Ry = R.from_euler('XYZ', [0, qe[0], 0]).as_dcm()
+                Rx = R.from_euler('XYZ', [qe[1], 0, 0]).as_dcm()
+                
+                R_matrix = Rz @ Ry @ Rx
+                eze = R_matrix[:, 2]
+                
+                err = ez[:, n] - eze
+                
+                s1 = np.sin(qe[0])
+                c1 = np.cos(qe[0])
+                s2 = np.sin(qe[1])
+                c2 = np.cos(qe[1])
+                
+                J = np.array([
+                    [-c1*c2, s1*s2],
+                    [0, c2],
+                    [-s1*c2, -c1*s2]
+                ])
+                dqe = pinv(J, rcond=5.0) @ err
+                qe = qe + 0.5 * dqe
+                
+                qe[0] = np.clip(qe[0],-np.pi,np.pi/2)
+                qe[1] = np.clip(qe[1],-np.pi,0)
+
+    return np.rad2deg(qe[0]),np.rad2deg(qe[1])
+
+
+def shoulder_ik_L(ez):
+    tsize = ez.shape[1]
+    
+    qe = np.array([0.0, 0.0])
     
     qe_m = np.zeros((2, tsize))
     
@@ -322,32 +358,10 @@ def shoulder_ik(ez):
                     [0, c2],
                     [-s1*c2, -c1*s2]
                 ])
-                dqe = pinv(J, rcond=1.0e-2) @ err
-                qe = qe + 0.5 * dqe[:2]  # 修正点：dqeを3次元から2次元に切り詰める
+                dqe = pinv(J, rcond=5.0) @ err
+                qe = qe + 0.5 * dqe
                 
+                qe[0] = np.clip(qe[0],-np.pi,np.pi/2)
+                qe[1] = np.clip(qe[1],0,np.pi)
 
-    return qe[0],qe[1]
-
-
-def camera_to_robot_coordinates_xyz(point):
-    
-    rotation = np.array([[1, 0, 0],
-                         [0, 1, 0],
-                         [0, 0, 1]])
-    
-    translation = np.array([[0, 0, 0]])
-    
-    camera_coordinates = np.array([[point.x,point.y,point.z]])
-    
-    temp = camera_coordinates.T - translation.T
-    
-    robot_coordinate = np.dot(rotation.T,temp)
-    
-    #横軸
-    robot_y = -(robot_coordinate[0])
-    #縦軸
-    robot_z = -(robot_coordinate[1])
-    #奥行き
-    robot_x = (robot_coordinate[2])
-    
-    return robot_x,robot_y,robot_z
+    return np.rad2deg(qe[0]),np.rad2deg(qe[1])

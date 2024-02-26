@@ -64,7 +64,7 @@ class rosOpenPose:
 
         image_sub = message_filters.Subscriber(color_topic, Image)
         depth_sub = message_filters.Subscriber(depth_topic, Image)
-        self.ts = message_filters.ApproximateTimeSynchronizer([image_sub, depth_sub], 1, 0.01)
+        self.ts = message_filters.ApproximateTimeSynchronizer([image_sub, depth_sub], 5, 0.01)
         self.ts.registerCallback(self.callback)
 
         """ OpenPose skeleton dictionary

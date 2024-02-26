@@ -2,42 +2,23 @@
 # -*- coding: utf-8 -*-
 import rospy
 from ros_openpose.msg import Frame
-from ros_openpose.msg import BodyPart
 
 #from ros_opsepose.msg import Persons
-import cv2
-import sys
-import message_filters
+
 from cv_bridge import CvBridge, CvBridgeError
-from sensor_msgs.msg import Image
 import numpy as np
 from std_msgs.msg import Float32MultiArray
-from sensor_msgs.msg import JointState
 import rosbag
 from datetime import datetime
-import csv
-from geometry_msgs.msg import Point32
-from scipy.spatial.transform import Rotation as R
-from scipy.linalg import pinv
-from scipy.signal import medfilt
-
 
 #以下がimportFile
 
 #publishする角度の制限
-from My_function_3D import limit_deg
 from My_function_3D import camera_to_robot_coordinates
-from My_function_3D import replace_nan_with_previous
 from My_function_3D import replace_nan_with_previous_ez
 from My_function_3D import ChUnitVector
-from My_function_3D import shoulder_ik_np
-from My_function_3D import shoulder_ik
-
-from Filter_3D import calculate_ema
-from Filter_3D import apply_moving_average_3d
-from Filter_3D import gaussian_filter
-from Filter_3D import median1d
-from Filter_3D import kalman_filter
+from My_function_3D import shoulder_ik_R
+from My_function_3D import shoulder_ik_L
 
 class depth_estimater:
     queue_size = 100
@@ -48,65 +29,55 @@ class depth_estimater:
     def __init__(self):
         
         #Use Myself RosTopic
-        self.Pub_deg = rospy.Publisher('Pub_deg' , Float32MultiArray , queue_size = 10, latch = True)
-        self.Pub_Conv_deg = rospy.Publisher('Pub_Conv_deg', Float32MultiArray, queue_size = 10,latch = True)
-        self.Pub_point = rospy.Publisher('Pub_point',Float32MultiArray ,queue_size = 10 ,latch = True)
+        self.Pub_deg = rospy.Publisher('Pub_deg' , Float32MultiArray , queue_size = 1, latch = True)
+        self.Pub_point_L = rospy.Publisher('Pub_point_L',Float32MultiArray ,queue_size = 10 ,latch = True)
+        self.Pub_point_R = rospy.Publisher('Pub_point_R',Float32MultiArray ,queue_size = 10 ,latch = True)
+        self.Pub_deg_R = rospy.Publisher('Pub_deg_R', Float32MultiArray, queue_size = 10,latch = True)
+        self.Pub_deg_L = rospy.Publisher('Pub_deg_L', Float32MultiArray, queue_size = 10,latch = True)
         
         #画像系のトピック
         
         self.bridge = CvBridge()
         frame_topic = rospy.get_param('~pub_topic')
-        #sub_rgb = message_filters.Subscriber("/usb_cam/image_raw", Image)
-        sub_depth =  message_filters.Subscriber("/depth_to_rgb/image_raw",Image)
-        print(sub_depth)
-        sub_pose = message_filters.Subscriber(frame_topic, Frame)
-        self.mf = message_filters.ApproximateTimeSynchronizer([sub_pose, sub_depth], 100, 0.5)
-        self.mf.registerCallback(self.ImageCallback)
+        self.sub_pose = rospy.Subscriber(frame_topic, Frame, self.ImageCallback, queue_size=10)
         
         #rosbagファイルの作成
         
         now = datetime.now()#現在の日時を習得
         date_string = now.strftime("%Y_%m_%d_%H:%M")  # 日付を指定の形式に変換
 
-        #thetaのpath
-        file_path_theta = '/home/kajilab/catkin_ws/src/ros_openpose/rosbag_file/rosbag_deg'
-        file_name_theta = f'Pub_deg_{date_string}.bag' # ファイル名に日付を追加
-        self.DegBag = rosbag.Bag(file_path_theta + '/' + file_name_theta,'w') # fileに書き込み
-        
-        #theta変更後の角度のpath
-        file_path_conv = '/home/kajilab/catkin_ws/src/ros_openpose/rosbag_file/rosbag_conv_theta'
-        file_name_conv = f'Pub_Conv_theta_{date_string}.bag' # ファイル名に日付を追加
-        self.convBag = rosbag.Bag(file_path_conv + '/' + file_name_conv,'w') # fileに書き込み
+        #各部位の右肘(point)
+        file_path_point_L = '/home/kajilab/catkin_ws/src/ros_openpose/rosbag_file/IK/point_L'
+        file_name_point_L = f'IK_Pub_point_L_{date_string}.bag' # ファイル名に日付を追加
+        self.pointLBag = rosbag.Bag(file_path_point_L + '/' + file_name_point_L,'w') # fileに書き込み
         
         #各部位の信頼度(point)
-        file_path_point = '/home/kajilab/catkin_ws/src/ros_openpose/rosbag_file/rosbag_pointXYZ'
-        file_name_point = f'Pub_point_{date_string}.bag' # ファイル名に日付を追加
-        self.pointBag = rosbag.Bag(file_path_point + '/' + file_name_point,'w') # fileに書き込み
+        file_path_point_R = '/home/kajilab/catkin_ws/src/ros_openpose/rosbag_file/IK/point_R'
+        file_name_point_R = f'IK_Pub_point_R_{date_string}.bag' # ファイル名に日付を追加
+        self.pointRBag = rosbag.Bag(file_path_point_R + '/' + file_name_point_R,'w') # fileに書き込み
         
-        self.all_degrees_R1 = np.array([])
-        self.all_degrees_R2 = np.array([])
-        self.all_degrees_L1 = np.array([])
-        self.all_degrees_L2 = np.array([])
-        self.save_point = np.array([])
-        self.ez_array = np.array([])
-        self.law_pass = np.array([])
-        self.origin_deg = np.array([0,0])
+        #右肘
+        file_path_degR = '/home/kajilab/catkin_ws/src/ros_openpose/rosbag_file/IK/deg_R'
+        file_name_degR = f'IK_Pub_degR_{date_string}.bag' # ファイル名に日付を追加
+        self.degR = rosbag.Bag(file_path_degR + '/' + file_name_degR,'w') # fileに書き込み
         
-        self.LPF_ez = np.array([0])
-        self.x_stack = []
+        #theta変更後の角度のpath
+        file_path_degL = '/home/kajilab/catkin_ws/src/ros_openpose/rosbag_file/IK/deg_L'
+        file_name_degL = f'IK_Pub_degL_{date_string}.bag' # ファイル名に日付を追加
+        self.degL = rosbag.Bag(file_path_degL + '/' + file_name_degL,'w') # fileに書き込み
+        
+        self.ez_array_R = np.array([])
+        self.ez_array_L = np.array([])
+    
+        self.all_degrees_R4 = np.array([])
+        self.all_degrees_L4 = np.array([])
         
         self.RElbow_array = np.array([])
-        self.Med_RElbow = np.array([])
-        #self.all_degrees_L2 = np.array([])
-
-        #self.all_degrees_R4 = np.array([])
-        #self.all_degrees_L4 = np.array([])
+        self.LElbow_array = np.array([])
 
 
-    def ImageCallback(self, pose_data, depth_data):
+    def ImageCallback(self, pose_data):
         try:
-            depth_image = self.bridge.imgmsg_to_cv2(depth_data, '16UC1')
-            depth_image = cv2.resize(depth_image, (int(depth_image.shape[1]*0.25), int(depth_image.shape[0]*0.25)))
             #bodyPart.pointはFrame.msgから引っ張ってくる。(三次元座標をやりたかったらbodyPart.points?????)
             #person,bodypartは変数
             #pose_data.person:人数のリスト,person.bodyParts:座標情報のリスト(pointの情報)
@@ -115,7 +86,6 @@ class depth_estimater:
             
             #text = [bodyPart.point for person in np.array(pose_data.persons) for bodyPart in np.array(person.bodyParts)]
             text = [bodyPart.point for person in np.array(pose_data.persons) for bodyPart in np.array(person.bodyParts)]
-            score = [bodyPart.score for person in np.array(pose_data.persons) for bodyPart in np.array(person.bodyParts)]
         except CvBridgeError as e:
             rospy.logerr(e)
         try:
@@ -168,12 +138,6 @@ class depth_estimater:
                     point_RWrist = pose_data.persons[target].bodyParts[4].point
                     point_LShoulder = pose_data.persons[target].bodyParts[5].point
                     point_LElbow = pose_data.persons[target].bodyParts[6].point 
-                    point_LWrist = pose_data.persons[target].bodyParts[7].point
-                    
-                #上半身の信頼度
-                    score_RSho =  pose_data.persons[target].bodyParts[2].score
-                    score_REl =  pose_data.persons[target].bodyParts[3].score
-                
 
                 
             
@@ -210,196 +174,99 @@ class depth_estimater:
             #print("右肘 X: {}, Y: {}, Z: {}".format(point_RElbow.x, point_RElbow.y ,point_RElbow.z))
             #print("右肘 X: {}, Y: {}, Z: {}".format(robot_RElbow[0], robot_RElbow[1] ,robot_RElbow[2]))
             
-            
-            
-            #右手首
-            robot_RWrist = camera_to_robot_coordinates(point_RWrist)
-            #print("右手首 X: {}, Y: {}, Z: {}".format(robot_x4, robot_y4 ,robot_z4))
-            
             #左肩
             robot_LSholuder = camera_to_robot_coordinates(point_LShoulder)
             
             #左肘
             robot_LElbow = camera_to_robot_coordinates(point_LElbow)
             
-            #左手首
-            robot_LWrist = camera_to_robot_coordinates(point_LWrist)
             
-            self.RElbow_array = np.append(self.RElbow_array,robot_RElbow[0])
+            self.RElbow_array = np.append(self.RElbow_array,robot_RElbow)
             
-            Not_NAN_RElbow = replace_nan_with_previous(self.RElbow_array)
+            Not_NAN_RElbow = replace_nan_with_previous_ez(self.RElbow_array)
             
+            self.LElbow_array = np.append(self.LElbow_array,robot_LElbow)
             
-            print("Not_NAN_-1",Not_NAN_RElbow[-1])
+            Not_NAN_LElbow = replace_nan_with_previous_ez(self.LElbow_array)
+
             
-            #filter_RElbow = medfilt(Not_NAN_RElbow, kernel_size=15)
+            #単位ベクトル摘出の部分
+            ez_R = ChUnitVector(robot_RSholuder,robot_RElbow)
+            ez_L = ChUnitVector(robot_LSholuder,robot_LElbow)
+
+            self.ez_array_R = np.append(self.ez_array_R,ez_R)
             
-            filter_RElbow = kalman_filter(Not_NAN_RElbow)
+            Not_NAN_ez_R = replace_nan_with_previous_ez(self.ez_array_R)
             
-            temp = filter_RElbow[-1]
+            self.ez_array_L = np.append(self.ez_array_L,ez_L)
             
-            #print("r_Elbow",temp)
+            Not_NAN_ez_L = replace_nan_with_previous_ez(self.ez_array_L)
             
-            
-            #角度摘出の部分
-            ez = ChUnitVector(robot_RSholuder,robot_RElbow)
-            
-            print("ez",ez)
-            
-            self.ez_array = np.append(self.ez_array,ez)
-            
-            Not_NAN_ez = replace_nan_with_previous_ez(self.ez_array)
-            
-            print("Not_NAN",Not_NAN_ez)
-            
-            #print("pokemon",Not_NAN_ez)
-            
-            #self.law_pass = np.append(self.law_pass,Not_NAN_ez)
-            """
-            
-            self.Med_RElbow = np.append(self.Med_RElbow,Not_NAN_RElbow[0])
-            
-            test = medfilt(self.Med_RElbow,15)
-            
-            robot_RElbow[0] = test[-1]
-            
-            alpha = 0.1
-            self.LPF_ez = (1.0-alpha)*self.LPF_ez + alpha*Not_NAN_ez
-            
-            print("LPF_ez",self.LPF_ez)
-            """
-            
-            # ガウシアンフィルタと指数移動平均を組み合わせて適用
-            #self.LPF_ez = apply_median_filter(Not_NAN_ez)
-            
-            """
-            self.x_stack.append(Not_NAN_ez)
-            if len(self.x_stack) > 10:
-                self.x_stack.pop(0)
-                self.LPF_ez = np.median(self.x_stack,axis=0)
-            """
-            
-            #print("LPF_ez",self.LPF_ez)
-            
-            """
-            print("NotNAN_x",Not_NAN_ez[-3])
-            print("NotNAN_y",Not_NAN_ez[-2])
-            print("NotNAN_z",Not_NAN_ez[-1])
-            """
+            #print("Not_NAN",Not_NAN_ez)
             
             #qe1,qe2 = shoulder_ik(Not_NAN_ez)
             
-            deg_R1,deg_R2 = shoulder_ik(Not_NAN_ez)
+            deg_R1,deg_R2 = shoulder_ik_R(Not_NAN_ez_R)
+            deg_L1,deg_L2 = shoulder_ik_L(Not_NAN_ez_L)
+            
+            
+            print("Sholuder pitch",deg_L1)
+            print("Sholuder roll",deg_L2)
 
-            print("Sholuder pitch",np.rad2deg(deg_R1))
-            print("Sholuder roll",np.rad2deg(deg_R2))
-            #print("q_suitei",qe)
-
-
-            #print("r",r)
-            #NAN埋めをしようとする配列の作成
-            #self.all_degrees_L1 = np.append(self.all_degrees_L2,deg_L1)
-            #self.all_degrees_L2 = np.append(self.all_degrees_L2,deg_L2)
-            self.all_degrees_R1 = np.append(self.all_degrees_R1,deg_R1)
-            self.all_degrees_R2 = np.append(self.all_degrees_R2,deg_R2)
-            
-            
-            #self.all_degrees_R4 = np.append(self.all_degrees_R4,deg_R3)
-            #self.all_degrees_L4 = np.append(self.all_degrees_L4,deg_L4)
-            
-            #print(self.all_degrees)
-            
-            #NAN埋めを処理している部分
-            
-            
-            #Deg_Not_NAN_L1 = replace_nan_with_previous(self.all_degrees_L1)
-            #Deg_Not_NAN_L2 = replace_nan_with_previous(self.all_degrees_L2)
-            Deg_Not_NAN_R1 = replace_nan_with_previous(self.all_degrees_R1)
-            Deg_Not_NAN_R2 = replace_nan_with_previous(self.all_degrees_R2)
-            
-            #Deg_Not_NAN_R4 = replace_nan_with_previous(self.all_degrees_R4)
-            #Deg_Not_NAN_L4 = replace_nan_with_previous(self.all_degrees_L4)
-            
-            #Deg_EMA_R1 = calculate_ema(Deg_Not_NAN_R1,0.6)
-            #Deg_EMA_R2 = calculate_ema(Deg_Not_NAN_R2,0.6)
-            
-            #NAN埋めした配列の末尾を取り出す部分
-            
-            Deg_R1 = Deg_Not_NAN_R1[-1]
-            Deg_R2 = Deg_Not_NAN_R2[-1]
-            #Deg_R1 = Deg_EMA_R1[-1]
-            #Deg_R2 = Deg_EMA_R2[-1]
-            
-            #print("pitch",Deg_R1)
-            #print("Roll",Deg_R2)
-            
-            self.origin_deg = np.array([Deg_R1,Deg_R2])
-            #print("q_org",self.origin_deg)
-            
-            #Deg_R4 = Deg_Not_NAN_R4[-1]
-            #Deg_L4 = Deg_Not_NAN_L4[-1]
-            
-            #DegのROSbagファイルの作成の部分
-            #Deg = np.array([Deg_L1,Deg_L2,Deg_R1,Deg_R2])
-            Deg = np.array([robot_RElbow[0],robot_RElbow[1],robot_RElbow[2]])
-            
-            #print("Light Roll",Deg_L1)
-            #print("Light pitch",Deg_L2)
-            #print("Right pitch",Deg_R1)
-            #print("Right roll",Deg_R2)
-            
-
-            
+            Deg = np.array([deg_L1,deg_L2,deg_R1,-deg_R2])
+            #Deg = np.array([deg_R1,-deg_R2])
             Pub_Deg = Float32MultiArray(data = Deg)
             
-            
-            
-            #角度変換(limit制限)
-            #conv_deg_L1 = limit_deg(Deg_L1,100,-95)
-            #conv_deg_L2 = limit_deg(Deg_L2,135,0)
-            conv_deg_R1 = limit_deg(Deg_R1,100,-95)
-            conv_deg_R2 = limit_deg(Deg_R2,135,0)
-            
-            #conv_deg_R4 = limit_deg(Deg_R4,25.0,-125.0)
-            #conv_deg_L4 = limit_deg(Deg_L4,25.0,-125.0)
+            #print("Pub_deg",Pub_Deg)
             
             
             #角度変換した角度の配列の格納
             #conv = np.array([conv_deg_L1,conv_deg_L2,conv_deg_R1,conv_deg_R2])
-            conv = np.array([conv_deg_R1,conv_deg_R2])
+            conv = np.array([0,0])
             Pub_conv = Float32MultiArray(data = conv)
             
             #各部位の信頼度(point)を格納
             
-            point = np.array([robot_RElbow[0],Not_NAN_RElbow[-1]])
-            Pub_point = Float32MultiArray(data = point)
+            point_L = np.array([robot_LSholuder[0],robot_LSholuder[1],robot_LSholuder[2],Not_NAN_LElbow[0],Not_NAN_LElbow[1],Not_NAN_LElbow[2]])
+            Pub_point_L = Float32MultiArray(data = point_L)
+            
+            point_R = np.array([robot_RSholuder[0],robot_RSholuder[1],robot_RSholuder[2],Not_NAN_RElbow[0],Not_NAN_RElbow[1],Not_NAN_RElbow[2]])
+            Pub_point_R = Float32MultiArray(data = point_R)
+            
+            deg_R = np.array([deg_R1,deg_R2])
+            Pub_deg_R = Float32MultiArray(data = deg_R)
+            
+            deg_L = np.array([deg_L1,deg_L2])
+            Pub_deg_L = Float32MultiArray(data = deg_L)
+            
             
             #Pub_conv値をパブリッシュ
-            self.Pub_Conv_deg.publish(Pub_conv)
-            
-            #bagファイルにデータを書き込む(theta)
-            self.DegBag.write('deg_array', Pub_Deg, rospy.Time.now())
-
-             #bagファイルにデータを書き込む(conv_theta)
-            self.convBag.write('conv_deg_array',Pub_conv,rospy.Time.now())
+            self.Pub_deg.publish(Pub_Deg)
             
             #bagファイルにデータを書き込む(point)
-            self.pointBag.write('point_array',Pub_point,rospy.Time.now())
-
+            self.pointLBag.write('point_array_L',Pub_point_L,rospy.Time.now())
+            
+            #bagファイルにデータを書き込む(point)
+            self.pointRBag.write('point_array_R',Pub_point_R,rospy.Time.now())
+            
+            #bagファイルにデータを書き込む(conv_theta)
+            self.degL.write('Pub_deg_L',Pub_deg_L,rospy.Time.now())
+            
+            self.degR.write('Pub_deg_R',Pub_deg_R,rospy.Time.now())
+            
         except:
             pass
     
     #bagファイルを閉じる処理
     def __del__(self):
             # ノードが終了するときにrosbagファイルを閉じる
-        self.DegBag.close()
-        self.convBag.close()
-        self.pointBag.close()
+        self.pointLBag.close()
+        self.pointRBag.close()
+        self.degL.close()
+        self.degR.close()
         
 if __name__ == '__main__':
     try:
-        
-        
         #ノードの宣言
         rospy.init_node('echo', anonymous=False)
 
@@ -407,7 +274,7 @@ if __name__ == '__main__':
 
         while not rospy.is_shutdown():
                 #10秒間起動を遅らせる
-            rospy.sleep(10.0)
+            rospy.sleep(31.0)
             rospy.loginfo("Start OpenPose")
             de = depth_estimater()
 
@@ -418,28 +285,6 @@ if __name__ == '__main__':
             rospy.signal_shutdown("Program completed")
             
             rate.sleep()
-        
-    
-        """
-        # ノードの宣言
-        rospy.init_node('echo', anonymous=False)
-        
-        # 10秒間待機
-        rospy.sleep(5.0)
-        
-        # プログラムの開始
-        rospy.loginfo("Start OpenPose")
-        de = depth_estimater()
-        
-        # 20秒間実行
-        rospy.sleep(30.0)
-        
-        # プログラムの停止
-        rospy.loginfo("Stopping OpenPose")
-        
-        # すべての処理が終わったらノードをシャットダウン
-        rospy.signal_shutdown("Program completed")
-        """
         
     except rospy.ROSInterruptException:
         pass

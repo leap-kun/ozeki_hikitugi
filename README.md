@@ -60,7 +60,7 @@ launchファイルの中に入っている,core.launchの下記の部分を変�
 手法1の場合
 
 ```
-type = echo_3D_fix_2.py , type = Meridian_OpenPose_console_2D.py
+type = echo_3D_NoIK.py , type = Meridian_OpenPose_console_3D_NoIK.py
 ```
 手法2の場合
 ```

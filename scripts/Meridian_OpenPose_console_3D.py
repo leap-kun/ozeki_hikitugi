@@ -440,30 +440,31 @@ def meridian_loop():
                         global r2_openpose
                         global r2_openpose_LPF
                         
-                        #左肩ロール
+                        
+                        #左肩ピッチ
                         l1_openpose_LPF += 0.1*(-l1_openpose_LPF + l1_openpose)
-                        s_meridim_motion[25] =  round(100 * l1_openpose_LPF)
+                        s_meridim_motion[23] =  round(100 * l1_openpose_LPF)
                         
-                        print("LSholuder",s_meridim_motion[25])
+                        #print("LSholuder",s_meridim_motion[25])
                         
                         
-                        #左肘ピッチ
+                        #左肩ロール
                         l2_openpose_LPF += 0.1*(-l2_openpose_LPF + l2_openpose)
-                        s_meridim_motion[29] =  round(100 * l2_openpose_LPF)
+                        s_meridim_motion[25] =  round(100 * l2_openpose_LPF)
                         
-                        print("LElbow:",s_meridim_motion[29])
+                        #print("LElbow:",s_meridim_motion[29])
                     
-                        #右肩ロール
+                        #右肩ピッチ
                         r1_opsepose_LPF += 0.1*(-r1_opsepose_LPF + r1_openpose)
-                        s_meridim_motion[55] =  round(100 * r1_opsepose_LPF)
+                        s_meridim_motion[53] =  round(100 * r1_opsepose_LPF)
                         
-                        print("Rsholuder",s_meridim_motion[55])
+                        #print("Rsholuder",s_meridim_motion[55])
 
-                        #右肘ピッチ
+                        #右肩ロール
                         r2_openpose_LPF += 0.1*(-r2_openpose_LPF + r2_openpose)
-                        s_meridim_motion[59] =  round(100 * r2_openpose_LPF)
+                        s_meridim_motion[55] =  round(100 * r2_openpose_LPF)
                         
-                        print("RElbow:",s_meridim_motion[59])
+                        #print("RElbow:",s_meridim_motion[59])
                         
 
                     # ④サーボ位置リセットボタン(Home)が押下されていたらいったん全サーボ位置を0にする
@@ -747,20 +748,25 @@ def callback(JointState):
         s_meridim_js_sub[21+i*2]=round(math.degrees(JointState.position[i])*100)*jspn[i]
         s_meridim_js_sub[51+i*2]=round(math.degrees(JointState.position[11+i])*100)*jspn[15+i]
 
-def openpose_cb(Pub_Conv_deg):
+def openpose_cb(Pub_deg):
     
     global s_meridim_motion
-    global r1_openpose
+   
     global l1_openpose
     global l2_openpose
+    global r1_openpose
     global r2_openpose
     
     
-    l1_openpose = Pub_Conv_deg.data[0]
-    l2_openpose = Pub_Conv_deg.data[1]
-    r1_openpose = Pub_Conv_deg.data[2]
-    r2_openpose = Pub_Conv_deg.data[3]
-    
+    l1_openpose = Pub_deg.data[0]
+    l2_openpose = Pub_deg.data[1]
+    r1_openpose = Pub_deg.data[2]
+    r2_openpose = Pub_deg.data[3]
+
+    """
+    r1_openpose = Pub_deg.data[0]
+    r2_openpose = Pub_deg.data[1]
+    """
     #print("s_meridim_Motion[55]:",s_meridim_motion[55])
     #print("s_meridim_Motion[25]:",s_meridim_motion[25])
     print("s_meridim_Motion[59]:",s_meridim_motion[59])
@@ -805,7 +811,7 @@ def main():
         error_servo_id = "None"
         start = time.time()
     
-    rospy.Subscriber('Pub_Conv_deg', Float32MultiArray ,openpose_cb)
+    rospy.Subscriber('Pub_deg', Float32MultiArray ,openpose_cb)
     
     while(True):
         
