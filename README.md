@@ -1,8 +1,8 @@
 # ozeki_hikitugi
 
-実際にうごかすと
+実際にうごかすとこんな感じになります。
 
-image or gif
+![gif](https://github.com/leap-kun/ozeki_hikitugi/tree/main/image)
 
 ## Overview
 
