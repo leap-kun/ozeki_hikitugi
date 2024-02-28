@@ -19,7 +19,7 @@ ros_openpoeを実装する際には、scrapboxに上がっているメモ書き�
 
 - Ubuntu 20.04
 - CUDA 11.7
-- Cudmm 8.5
+- Cudnn 8.5
 - Nvidia Driver:535
 
 ## attention!!
@@ -46,6 +46,13 @@ source devel/setup.bash
 roslaunch ros_openpose run.launch camera:=azurekinect
 ```
 この際に、AzurekinectDKを接続してください。
+
+## Azure kinect ROSのDriverについて
+
+自前のPCで実装したい場合に、Usageに記載しているコマンドを入力しても実行出来ない為、
+Referenceにある[azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)をインストールと、[azure kinect DK ROS Noetic use](https://qiita.com/sunrise_lover/items/1a70ddafee44419eda2a)
+を参照しながら実装してください。
+
 
 ## 手法1と手法2の切り替え
 
@@ -97,6 +104,7 @@ ER20027:尾関健太郎
 [ros_openpose](https://github.com/ravijo/ros_openpose)  
 [ros_openposeの構築の上で参照になったサイト](https://yoshistl.hatenablog.com/entry/2022/07/31/014254)  
 [azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)  
+[azure kinect DK ROS Noetic use](https://qiita.com/sunrise_lover/items/1a70ddafee44419eda2a)
 [Nvidia_Driverおすすめ構築サイト](https://qiita.com/tf63/items/0c6da72fe749319423b4)  
 [Meridian_Twin](https://github.com/Ninagawa123/Meridian_TWIN%EF%BF%BC)  
 [Meridian_LITE](https://github.com/Ninagawa123/Meridian_LITE)

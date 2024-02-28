@@ -5,8 +5,8 @@
   <description>ROS wrapper for OpenPose</description>
 
   <!-- The maintainer tag -->
-  <maintainer email="ravi2008joshi@gmail.com">Ravi Joshi</maintainer>
-  <author email="ravi2008joshi@gmail.com">Ravi Joshi</author>
+  <ros_openpose email="ravi2008joshi@gmail.com">Ravi Joshi</ros_openpose>
+  <author email="er20027-1019@gs4e.chubu.ac.jp">ozeki kentaro</author>
 
   <!-- The license tag -->
   <license>MIT</license>
