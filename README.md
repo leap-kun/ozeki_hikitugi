@@ -24,15 +24,15 @@ ros_openpoeを実装する際には、scrapboxに上がっているメモ書き�
 
 ## attention!!
 
-研究室のPCのNvidia Driverのversionを今のやつより幾つか古くして欲しいです。
-恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く**点滅**したり**ノイズが入ること**が多々あります。
-そのため、研究室のPCを扱う上で、**Nvidia Driverのインストール等**を覚えてもらう為に一度、手を動かして感覚を補いましょう！！
+研究室のPCのNvidia Driverのversionを今のやつより幾つか古くして欲しいです。(研究室にあるPCのGPUのドライバーが古い為)  
+恐らく,Nvidia Driverの*verison*が新しいせいで、起動時に暗く**点滅**したり**ノイズが入ること**が多々あります。  
+そのため、研究室のPCを扱う上で、**Nvidia Driverのインストール等**を覚えてもらう為に一度、手を動かして感覚を補いましょう！！  
 参考**Reference**に参考になるサイトも掲載していますので、がんばりましょう！！
 
 
 ## Nvidia Driverインストールの注意点
 
-**recomended**って書いてあるやつは基本入れない。
+**recomended**って書いてあるやつは基本入れない。  
 基本的に,non-free等の何も書いてないやつをインストールする。
 
 
@@ -49,7 +49,7 @@ roslaunch ros_openpose run.launch camera:=azurekinect
 
 ## Azure kinect ROSのDriverについて
 
-自前のPCで実装したい場合に、Usageに記載しているコマンドを入力しても実行出来ない為、
+自前のPCで実装したい場合に、Usageに記載しているコマンドを入力しても実行出来ない為、  
 Referenceにある[azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)をインストールと、[azure kinect DK ROS Noetic use](https://qiita.com/sunrise_lover/items/1a70ddafee44419eda2a)
 を参照しながら実装してください。
 
