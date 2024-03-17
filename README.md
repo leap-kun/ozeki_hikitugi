@@ -11,7 +11,15 @@
 このリポジトリは、他の研究生が自前のPCを使う為に一応残しておくためのものです。
 かなり粗があるかと思いますがご容赦くださいm(_ _)m
 
-## KHR-3HV
+## ブンチャンについて
+
+本機体(ブンチャン)はMeridian_LITEを搭載していて、Meirdian_LITEのバージョンが**v1.0.0**である。
+
+## Meridianを扱う上での注意するポイント
+
+- Meridian Boardのピンの指す向きを誤ってしまうと、半二重回路が壊れてしまうため注意!!
+- Meridian LITEを扱う上で,Referanceの[ESP32 pin設定](https://qiita.com/Ninagawa123/items/8ce2d55728fd5973087d)を設定しないと、左半身付随になる。
+- ロボットとの動作しないのは、大体ESP32とPCとのIPアドレスが一致していない事が多い。(Console画面の**番号4**のERROR RATEが99%近くなっている)
 
 **今現段階の環境**
 
@@ -45,7 +53,7 @@ roslaunch ros_openpose run.launch camera:=azurekinect
 ```
 この際に、AzurekinectDKを接続してください。
 
-そして、以下の画像にあるConsole画面の番号3のチェックボックスをすべて**ON**にする事により、上記のgif画像の様になる。**(起動時から30秒後くらいに動き出します)** 
+そして、以下の画像にあるConsole画面の**番号3**のチェックボックスをすべて**ON**にする事により、上記のgif画像の様になる。**(起動時から30秒後くらいに動き出します)** 
 
 ![image](https://github.com/leap-kun/ozeki_hikitugi/blob/main/image/Meridian_Console.png)
 
@@ -113,3 +121,4 @@ ER20027:尾関健太郎
 [Meridian_Twin](https://github.com/Ninagawa123/Meridian_TWIN%EF%BF%BC)  
 [Meridian_LITE](https://github.com/Ninagawa123/Meridian_LITE)
 [Meridian 計画](https://note.com/ninagawa123/n/nb768563591be)
+[ESP32 pin設定](https://qiita.com/Ninagawa123/items/8ce2d55728fd5973087d)
