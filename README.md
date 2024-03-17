@@ -4,14 +4,14 @@
 
 ![gif](https://github.com/leap-kun/ozeki_hikitugi/blob/main/image/OpenPose_KHR_test.gif)
 
-本研究はravi Joshi氏が作成した、ros_openposeとMeridian計画をかけ合わせたものである。
+本研究はravi Joshi氏が作成した、ros_openposeと二名川 和泉氏が作成したMeridian計画をかけ合わせたものである。
 
 ## Overview
 
 このリポジトリは、他の研究生が自前のPCを使う為に一応残しておくためのものです。
 かなり粗があるかと思いますがご容赦くださいm(_ _)m
 
-## Requirement
+## KHR-3HV
 
 **今現段階の環境**
 
@@ -44,6 +44,12 @@ source devel/setup.bash
 roslaunch ros_openpose run.launch camera:=azurekinect
 ```
 この際に、AzurekinectDKを接続してください。
+
+そして、以下の画像にあるConsole画面の番号3のチェックボックスをすべて**ON**にする事により、上記のgif画像の様になる。**(起動時から30秒後くらいに動き出します)** 
+
+![image](https://github.com/leap-kun/ozeki_hikitugi/blob/main/image/Meridian_Console.png)
+
+
 
 ## Azure kinect ROSのDriverについて
 
@@ -106,3 +112,4 @@ ER20027:尾関健太郎
 [Nvidia_Driverおすすめ構築サイト](https://qiita.com/tf63/items/0c6da72fe749319423b4)  
 [Meridian_Twin](https://github.com/Ninagawa123/Meridian_TWIN%EF%BF%BC)  
 [Meridian_LITE](https://github.com/Ninagawa123/Meridian_LITE)
+[Meridian 計画](https://note.com/ninagawa123/n/nb768563591be)
