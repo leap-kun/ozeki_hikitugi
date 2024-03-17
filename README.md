@@ -11,17 +11,7 @@
 このリポジトリは、他の研究生が自前のPCを使う為に一応残しておくためのものです。
 かなり粗があるかと思いますがご容赦くださいm(_ _)m
 
-## ブンチャンについて
-
-本機体(ブンチャン)はMeridian_LITEを搭載していて、Meirdian_LITEのバージョンが**v1.0.0**である。
-
-## Meridianを扱う上での注意するポイント
-
-- Meridian Boardのピンの指す向きを誤ってしまうと、半二重回路が壊れてしまうため注意!!
-- Meridian LITEを扱う上で,Referanceの[ESP32 pin設定](https://qiita.com/Ninagawa123/items/8ce2d55728fd5973087d)を設定しないと、左半身付随になる。
-- ロボットとの動作しないのは、大体ESP32とPCとのIPアドレスが一致していない事が多い。(Console画面の**番号4**のERROR RATEが99%近くなっている)
-
-**今現段階の環境**
+## 今現段階の研究室のPCの環境
 
 - Ubuntu 20.04
 - CUDA 11.7
@@ -41,6 +31,11 @@
 **recomended**って書いてあるやつは基本入れない。  
 基本的に,non-free等の何も書いてないやつをインストールする。
 
+## Azure kinect ROSのDriverについて
+
+自前のPCで実装したい場合に、Usageに記載しているコマンドを入力しても実行出来ない為、  
+Referenceにある[azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)をインストールと、[azure kinect DK ROS Noetic use](https://qiita.com/sunrise_lover/items/1a70ddafee44419eda2a)
+を参照しながら実装してください。
 
 ## Usage
 
@@ -57,13 +52,15 @@ roslaunch ros_openpose run.launch camera:=azurekinect
 
 ![image](https://github.com/leap-kun/ozeki_hikitugi/blob/main/image/Meridian_Console.png)
 
+## ブンチャンについて
 
+本機体(ブンチャン)はMeridian_LITEを搭載していて、Meirdian_LITEのバージョンが**v1.0.0**である。
 
-## Azure kinect ROSのDriverについて
+## Meridianを扱う上での注意するポイント
 
-自前のPCで実装したい場合に、Usageに記載しているコマンドを入力しても実行出来ない為、  
-Referenceにある[azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)をインストールと、[azure kinect DK ROS Noetic use](https://qiita.com/sunrise_lover/items/1a70ddafee44419eda2a)
-を参照しながら実装してください。
+- Meridian Boardのピンの指す向きを誤ってしまうと、半二重回路が壊れてしまうため注意!!
+- Meridian LITEを扱う上で,Referanceの[ESP32 pin設定](https://qiita.com/Ninagawa123/items/8ce2d55728fd5973087d)を設定しないと、左半身付随になる。
+- ロボットとの動作しないのは、大体ESP32とPCとのIPアドレスが一致していない事が多い。(Console画面の**番号4**のERROR RATEが99%近くなっている)
 
 
 ## 手法1と手法2の切り替え
