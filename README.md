@@ -110,6 +110,7 @@ ER20027:尾関健太郎
 ## Reference
 
 [openpose](https://github.com/CMU-Perceptual-Computing-Lab/openpose)  
+[install openpose](https://github.com/wuyenlin/openpose_installation_guide)
 [ros_openpose](https://github.com/ravijo/ros_openpose)  
 [ros_openposeの構築の上で参照になったサイト](https://yoshistl.hatenablog.com/entry/2022/07/31/014254)  
 [azure_kinect_ROS_Driver](https://github.com/microsoft/Azure_Kinect_ROS_Driver)  
