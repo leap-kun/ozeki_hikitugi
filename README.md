@@ -8,8 +8,6 @@
 
 ## Overview
 
-ros_openpoeを実装する際には、scrapboxに上がっているメモ書きを参照してください。 基本的には、home/catkin_ws/src/ros_openpose/の直下にある.CmakeListsやpackage.xmlを参照にすれば大丈夫かと思います。
-
 このリポジトリは、他の研究生が自前のPCを使う為に一応残しておくためのものです。
 かなり粗があるかと思いますがご容赦くださいm(_ _)m
 
